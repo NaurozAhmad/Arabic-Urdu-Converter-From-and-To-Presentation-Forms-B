@@ -8,7 +8,7 @@ var COMB_MAP_LENGTH = 4;
 var TRANS_CHARS_LENGTH = 39;
 
 
-var CharRepStruct = {
+var CharRep = {
   code: 0,
   mIsolated: 0,
   mInitial: 0,
@@ -17,7 +17,7 @@ var CharRepStruct = {
 };
 
 
-var CombCharRepStruct = {
+var CombCharRep = {
   code: 0,
   mIsolated: 0,
   mInitial: 0,
@@ -25,7 +25,7 @@ var CombCharRepStruct = {
   mFinal: 0
 };
 
-var CharRep = [
+var charsMap = [
   [0x0621, 0xFE80, NIL, NIL, NIL], /* HAMZA */
   [0x0622, 0xFE81, NIL, NIL, 0xFE82], /* ALEF_MADDA */
   [0x0623, 0xFE83, NIL, NIL, 0xFE84], /* ALEF_HAMZA_ABOVE */
@@ -66,7 +66,7 @@ var CharRep = [
   [0x064A, 0xFEF1, 0xFEF3, 0xFEF4, 0xFEF2] /* YEH */
 ];
 
-var CombCharRep = [
+var combCharsMap = [
       [[0x0644, 0x0622], 0xFEF5, NIL, NIL, 0xFEF6], /* LAM_ALEF_MADDA */
       [[0x0644, 0x0623], 0xFEF7, NIL, NIL, 0xFEF8], /* LAM_ALEF_HAMZA_ABOVE */
       [[0x0644, 0x0625], 0xFEF9, NIL, NIL, 0xFEFA], /* LAM_ALEF_HAMZA_BELOW */
@@ -116,4 +116,75 @@ var transChars = [
     ];
 
 
+/**
+ * TODO rename into camelCase
+ * @param code
+ * @returns {boolean}
+ */
+function CharacterMapContains(code)
+{
+  for (var i = 0; i < MAP_LENGTH; i++)
+  {
+    if (charsMap[i].code === code) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * TODO rename into camelCase
+ * @param code
+ * @returns {CharRep}
+ */
+function GetCharRep(code)
+{
+  for (var i = 0; i < MAP_LENGTH; i++)
+  {
+    if (charsMap[i].code === code) {
+      return charsMap[i];
+    }
+  }
+
+  //FIXME CharRep object
+  return [ NIL, NIL, NIL, NIL ];
+}
+
+
+/**
+ *
+ * @param code1
+ * @param code2
+ * @returns {CombCharRep}
+ */
+function  GetCombCharRep( code1, code2)
+{
+  for (var i = 0; i < COMB_MAP_LENGTH; i++)
+  {
+    if (combCharsMap[i].code[0] === code1 && combCharsMap[i].code[1] === code2) {
+      return combCharsMap[i];
+    }
+  }
+
+  //FIXME CombCharRep object
+  return [[ NIL, NIL ], NIL, NIL, NIL ];
+}
+
+/**
+ *
+ * @param code
+ * @returns {boolean}
+ * @constructor
+ */
+function IsTransparent(code)
+{
+  for (var i = 0; i < TRANS_CHARS_LENGTH; i++)
+  {
+    if (transChars[i] === code) {
+      return true;
+    }
+  }
+  return false;
+}
 
