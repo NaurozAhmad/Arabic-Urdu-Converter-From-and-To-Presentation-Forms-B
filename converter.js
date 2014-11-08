@@ -1,13 +1,43 @@
 "use strict";
-console.log('Convertation!');
+module.exports = {
+  convertArabic: convertArabic,
+  convertArabicBack: convertArabicBack
+};
 
+
+/**
+ * @private
+ * @type {number}
+ */
 var NIL = 0x0000;
 
+/**
+ * @TODO replace with charsMap.length
+ * @private
+ * @type {number}
+ */
 var MAP_LENGTH = 37;
+
+/**
+ * @TODO replace with combCharsMap.length
+ * @private
+ * @type {number}
+ */
 var COMB_MAP_LENGTH = 4;
+
+/**
+ * @TODO replace with transChars.length
+ * @private
+ * @type {number}
+ */
 var TRANS_CHARS_LENGTH = 39;
 
 
+/**
+ * TODO refactor charsMap for the following structure
+ * @private
+ * @type {{code: number, mIsolated: number, mInitial: number, mMedial: number, mFinal: number}}
+ */
 var CharRep = {
   code: 0,
   mIsolated: 0,
@@ -16,7 +46,11 @@ var CharRep = {
   mFinal: 0
 };
 
-
+/**
+ * TODO refactor combCharsMap for the following structure
+ * @private
+ * @type {{code: number, mIsolated: number, mInitial: number, mMedial: number, mFinal: number}}
+ */
 var CombCharRep = {
   code: 0,
   mIsolated: 0,
@@ -25,6 +59,10 @@ var CombCharRep = {
   mFinal: 0
 };
 
+/**
+ * @private
+ * @type {*[]}
+ */
 var charsMap = [
   [0x0621, 0xFE80, NIL, NIL, NIL], /* HAMZA */
   [0x0622, 0xFE81, NIL, NIL, 0xFE82], /* ALEF_MADDA */
@@ -66,6 +104,10 @@ var charsMap = [
   [0x064A, 0xFEF1, 0xFEF3, 0xFEF4, 0xFEF2] /* YEH */
 ];
 
+/**
+ * @private
+ * @type {*[]}
+ */
 var combCharsMap = [
       [[0x0644, 0x0622], 0xFEF5, NIL, NIL, 0xFEF6], /* LAM_ALEF_MADDA */
       [[0x0644, 0x0623], 0xFEF7, NIL, NIL, 0xFEF8], /* LAM_ALEF_HAMZA_ABOVE */
@@ -118,6 +160,8 @@ var transChars = [
 
 /**
  * TODO rename into camelCase
+ * @private
+ *
  * @param code
  * @returns {boolean}
  */
@@ -125,7 +169,8 @@ function CharacterMapContains(code)
 {
   for (var i = 0; i < MAP_LENGTH; i++)
   {
-    if (charsMap[i].code === code) {
+    //[0] == .code
+    if (charsMap[i][0] === code) {
       return true;
     }
   }
@@ -135,6 +180,8 @@ function CharacterMapContains(code)
 
 /**
  * TODO rename into camelCase
+ * @private
+ *
  * @param code
  * @returns {CharRep}
  */
@@ -142,7 +189,8 @@ function GetCharRep(code)
 {
   for (var i = 0; i < MAP_LENGTH; i++)
   {
-    if (charsMap[i].code === code) {
+    //[0] == .code
+    if (charsMap[i][0] === code) {
       return charsMap[i];
     }
   }
@@ -153,6 +201,8 @@ function GetCharRep(code)
 
 
 /**
+ * @TODO rename into camelCase
+ * @private
  *
  * @param code1
  * @param code2
@@ -162,7 +212,8 @@ function  GetCombCharRep( code1, code2)
 {
   for (var i = 0; i < COMB_MAP_LENGTH; i++)
   {
-    if (combCharsMap[i].code[0] === code1 && combCharsMap[i].code[1] === code2) {
+    //[0] == .code
+    if (combCharsMap[i][0][0] === code1 && combCharsMap[i][0][1] === code2) {
       return combCharsMap[i];
     }
   }
@@ -172,10 +223,11 @@ function  GetCombCharRep( code1, code2)
 }
 
 /**
+ * @TODO rename into camelCase
+ * @private
  *
  * @param code
  * @returns {boolean}
- * @constructor
  */
 function IsTransparent(code)
 {
@@ -186,5 +238,162 @@ function IsTransparent(code)
     }
   }
   return false;
+}
+
+/**
+ * convert to Arabic Presentation Forms B
+ * @param normal
+ * @returns {string}
+ */
+function convertArabic(normal) {
+  var len = normal.length;
+  /* typeof CharRep*/
+  var crep;
+
+  /* typeof CombCharRep*/
+  var combcrep;
+
+  var shaped = [];
+
+  var writeCount = 0;
+  for (var i = 0; i < len; i++) {
+    var current = normal.charCodeAt(i);
+    if (CharacterMapContains(current)) {
+      var prev = NIL;
+      var next = NIL;
+      var prevID = i - 1;
+      var nextID = i + 1;
+
+      /*
+       Transparent characters have no effect in the shaping process.
+       So, ignore all the transparent characters that are BEFORE the
+       current character.
+       */
+      for (; prevID >= 0; prevID--) {
+        if (!IsTransparent(normal.charCodeAt(prevID))) {
+          break;
+        }
+      }
+
+
+      //[2] == .mInitial
+      //[3] == .mMedial
+      if ((prevID < 0) || !CharacterMapContains(prev = normal.charCodeAt(prevID)) ||
+          (((crep = GetCharRep(prev))[2] === NIL) && (crep[3] === NIL))) {
+        prev = NIL;
+      }
+
+      /*
+       Transparent characters have no effect in the shaping process.
+       So, ignore all the transparent characters that are AFTER the
+       current character.
+       */
+      for (; nextID < len; nextID++) {
+        if (!IsTransparent(normal.charCodeAt(nextID))) {
+          break;
+        }
+      }
+
+      //[3] == .mMedial
+      //[4] == .mFinal
+      if ((nextID >= len) || !CharacterMapContains(next = normal.charCodeAt(nextID)) ||
+          (((crep = GetCharRep(next))[3] === NIL) &&
+          ((crep = GetCharRep(next))[4] === NIL) && (next !== 0x0640))) {
+        next = NIL;
+      }
+
+      /* Combinations */
+      if (current === 0x0644 && next !== NIL && (next === 0x0622 || next === 0x0623 ||
+          next === 0x0625 || next === 0x0627)) {
+        combcrep = GetCombCharRep(current, next);
+        if (prev !== NIL) {
+          //[4] == .mFinal
+          shaped[writeCount++] = combcrep[4];
+        }
+        else {
+          //[1] == .mIsolated
+          shaped[writeCount++] = combcrep[1];
+        }
+        i++;
+        continue;
+      }
+
+      crep = GetCharRep(current);
+
+      /* Medial */
+      //[3] == .mMedial
+      if (prev !== NIL && next !== NIL && crep[3] !== NIL) {
+        shaped[writeCount++] = crep[3];
+        continue;
+        /* Final */
+      }
+      //[4] == .mFinal
+      else if (prev !== NIL && crep[4] !== NIL) {
+        //[4] == .mFinal
+        shaped[writeCount++] = crep[4];
+        continue;
+        /* Initial */
+      }
+
+      //[2] == .mInitial
+      else if (next !== NIL && crep[2] !== NIL) {
+        shaped[writeCount++] = crep[2];
+        continue;
+      }
+      /* Isolated */
+      //[1] == .mIsolated
+      shaped[writeCount++] = crep[1];
+    }
+    else {
+      shaped[writeCount++] = current;
+    }
+  }
+  shaped[writeCount] = NIL;
+  var toReturn = '';
+  for (var d = 0; d < writeCount; d++) {
+
+    if (typeof shaped[d] !== 'undefined') {
+      //toReturn += shaped[d] +' ';
+      toReturn += String.fromCharCode(shaped[d]);
+    } else {
+      console.error('Undefined symbol # ', d);
+    }
+  }
+
+  return toReturn;
+}
+
+
+/**
+ * convert from Arabic Presentation Forms B
+ * @param apfb
+ * @returns {string}
+ */
+function convertArabicBack(apfb) {
+  var toReturn = "";
+  var charCode;
+  var selectedChar;
+  //console.log("apfb length: ", apfb.length);
+
+  for (var i = 0; i < apfb.length; i++) {
+    selectedChar = apfb.charCodeAt(i);
+    //console.log("selected char: ", selectedChar);
+
+    for (var j = 0; j < MAP_LENGTH; j++) {
+      //[4] == .mFinal
+      //[2] == .mInitial
+      //[1] == .mIsolated
+      //[3] == .mMedial
+      if (charsMap[j][4] === selectedChar || charsMap[j][2] === selectedChar ||
+          charsMap[j][1] === selectedChar || charsMap[j][3] === selectedChar) {
+        //[0] == .code
+        charCode = charsMap[j][0];
+      }
+    }
+    //console.log("final char: ", charCode);
+    toReturn += String.fromCharCode(charCode);
+  }
+
+  return toReturn;
 }
 
