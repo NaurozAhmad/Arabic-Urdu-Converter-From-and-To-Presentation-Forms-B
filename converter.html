@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+	<meta charset="UTF-8">
+	<title></title>
+</head>
+<body>
+<textarea name="arabic" id="arabic" cols="30" rows="10"></textarea>
+<div id="arabicNote"></div>
+
+<textarea name="arabicB" id="arabicB" cols="30" rows="10"></textarea>
+<div id="arabicBNote"></div>
+
+<button id="toArabicB">To Arabic Form B</button>
+<button id="toArabic">To Arabic</button>
+
+<script type="text/javascript" src="converter.js"></script>
+<script type="text/javascript">
+	var arabicText = document.getElementById('arabic');
+	var arabicNote = document.getElementById('arabicNote');
+	var arabicBText = document.getElementById('arabicB');
+	var arabicBNote = document.getElementById('arabicBNote');
+
+	document.getElementById('toArabicB').addEventListener('click', function(){
+		arabicBText.value =  arabicConverter.convertArabic(arabicText.value);
+		updateNotes();
+	});
+
+	document.getElementById('toArabic').addEventListener('click', function(){
+		arabicText.value = arabicConverter.convertArabicBack(arabicBText.value);
+		updateNotes();
+	});
+
+	function updateNotes(){
+		var buffer = '';
+		for (var i in arabicText.value){
+			buffer += arabicText.value.charCodeAt(i) + ' ';
+		}
+		arabicNote.innerText = buffer;
+
+		var bufferB = '';
+		for (var j in arabicBText.value){
+			bufferB += arabicBText.value.charCodeAt(j) + ' ';
+		}
+		arabicBNote.innerText = bufferB;
+	}
+
+
+</script>
+</body>
+</html>

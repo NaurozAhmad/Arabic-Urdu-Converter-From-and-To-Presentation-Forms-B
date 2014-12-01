@@ -1,7 +1,35 @@
 var converter = require('./converter');
 
-var testStringTo = 'مؤسسة';
-console.log(converter.convertArabic(testStringTo));
+var locales = {
+	"January": "يناير",
+	"February": "فبراير",
+	"March": "مارس",
+	"April": "إبريل",
+	"May": "مايو",
+	"June": "يونيو",
+	"July": "يوليو",
+	"August": "أغسطس",
+	"September": "سبتمبر",
+	"October": "أكتوبر",
+	"November": "نوفمبر",
+	"December": "ديسمبر",
+	"Sunday": "الأحد",
+	"Monday": "الإثنين",
+	"Tuesday": "الثلاثاء",
+	"Wednesday": "الأربعاء",
+	"Thursday": "الخميس",
+	"Friday": "الجمعة",
+	"Saturday": "السبت"
+};
 
-var testStringFrom = 'ﻣﺆﺳﺴﺔ';
-console.log(converter.convertArabicBack(testStringFrom));
+
+Object.keys(locales).forEach(function (key) {
+	"use strict";
+
+	var item = locales[key];
+	// console.log(item);
+	locales[key] = converter.convertArabic(item);
+});
+
+console.log(JSON.stringify(locales, null, 2));
+
