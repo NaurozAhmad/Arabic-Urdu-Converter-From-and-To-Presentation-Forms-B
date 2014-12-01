@@ -48,26 +48,26 @@
      * @private
      * @type {{code: number, mIsolated: number, mInitial: number, mMedial: number, mFinal: number}}
      */
-    var CharRep = {
-        code: 0,
-        mIsolated: 0,
-        mInitial: 0,
-        mMedial: 0,
-        mFinal: 0
-    };
+    //var CharRep = {
+    //    code: 0,
+    //    mIsolated: 0,
+    //    mInitial: 0,
+    //    mMedial: 0,
+    //    mFinal: 0
+    //};
 
     /**
      * TODO refactor combCharsMap for the following structure
      * @private
      * @type {{code: number, mIsolated: number, mInitial: number, mMedial: number, mFinal: number}}
      */
-    var CombCharRep = {
-        code: 0,
-        mIsolated: 0,
-        mInitial: 0,
-        mMedial: 0,
-        mFinal: 0
-    };
+    //var CombCharRep = {
+    //    code: 0,
+    //    mIsolated: 0,
+    //    mInitial: 0,
+    //    mMedial: 0,
+    //    mFinal: 0
+    //};
 
     /**
      * @private
@@ -175,7 +175,7 @@
      * @param code
      * @returns {boolean}
      */
-    function CharacterMapContains(code)
+    function characterMapContains(code)
     {
         for (var i = 0; i < MAP_LENGTH; i++)
         {
@@ -195,7 +195,7 @@
      * @param code
      * @returns {CharRep}
      */
-    function GetCharRep(code)
+    function getCharRep(code)
     {
         for (var i = 0; i < MAP_LENGTH; i++)
         {
@@ -218,7 +218,7 @@
      * @param code2
      * @returns {CombCharRep}
      */
-    function  GetCombCharRep( code1, code2)
+    function  getCombCharRep( code1, code2)
     {
         for (var i = 0; i < COMB_MAP_LENGTH; i++)
         {
@@ -239,7 +239,7 @@
      * @param code
      * @returns {boolean}
      */
-    function IsTransparent(code)
+    function isTransparent(code)
     {
         for (var i = 0; i < TRANS_CHARS_LENGTH; i++)
         {
@@ -268,7 +268,7 @@
         var writeCount = 0;
         for (var i = 0; i < len; i++) {
             var current = normal.charCodeAt(i);
-            if (CharacterMapContains(current)) {
+            if (characterMapContains(current)) {
                 var prev = NIL;
                 var next = NIL;
                 var prevID = i - 1;
@@ -280,7 +280,7 @@
                  current character.
                  */
                 for (; prevID >= 0; prevID--) {
-                    if (!IsTransparent(normal.charCodeAt(prevID))) {
+                    if (!isTransparent(normal.charCodeAt(prevID))) {
                         break;
                     }
                 }
@@ -288,8 +288,8 @@
 
                 //[2] == .mInitial
                 //[3] == .mMedial
-                if ((prevID < 0) || !CharacterMapContains(prev = normal.charCodeAt(prevID)) ||
-                    (((crep = GetCharRep(prev))[2] === NIL) && (crep[3] === NIL))) {
+                if ((prevID < 0) || !characterMapContains(prev = normal.charCodeAt(prevID)) ||
+                    (((crep = getCharRep(prev))[2] === NIL) && (crep[3] === NIL))) {
                     prev = NIL;
                 }
 
@@ -299,23 +299,23 @@
                  current character.
                  */
                 for (; nextID < len; nextID++) {
-                    if (!IsTransparent(normal.charCodeAt(nextID))) {
+                    if (!isTransparent(normal.charCodeAt(nextID))) {
                         break;
                     }
                 }
 
                 //[3] == .mMedial
                 //[4] == .mFinal
-                if ((nextID >= len) || !CharacterMapContains(next = normal.charCodeAt(nextID)) ||
-                    (((crep = GetCharRep(next))[3] === NIL) &&
-                    ((crep = GetCharRep(next))[4] === NIL) && (next !== 0x0640))) {
+                if ((nextID >= len) || !characterMapContains(next = normal.charCodeAt(nextID)) ||
+                    (((crep = getCharRep(next))[3] === NIL) &&
+                    ((crep = getCharRep(next))[4] === NIL) && (next !== 0x0640))) {
                     next = NIL;
                 }
 
                 /* Combinations */
                 if (current === 0x0644 && next !== NIL && (next === 0x0622 || next === 0x0623 ||
                     next === 0x0625 || next === 0x0627)) {
-                    combcrep = GetCombCharRep(current, next);
+                    combcrep = getCombCharRep(current, next);
                     if (prev !== NIL) {
                         //[4] == .mFinal
                         shaped[writeCount++] = combcrep[4];
@@ -328,7 +328,7 @@
                     continue;
                 }
 
-                crep = GetCharRep(current);
+                crep = getCharRep(current);
 
                 /* Medial */
                 //[3] == .mMedial
