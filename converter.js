@@ -1,3 +1,14 @@
+/**
+ * Converter from Arabic to Arabic Presentation Forms-B
+ * http://en.wikipedia.org/wiki/Arabic_(Unicode_block)
+ * http://en.wikipedia.org/wiki/Arabic_Presentation_Forms-B
+ *
+ * Usage:
+ * var arabicFormBText = arabicConverter.convertArabic(arabicText);
+ * var arabicText = convertArabicBack.convertArabic(arabicFormBText);
+ *
+ * @link https://github.com/lamerw/Arabic-Converter-From-and-To-Arabic-Presentation-Forms-B
+ */
 (function (root, factory) {
     "use strict";
     /* global define:true */
