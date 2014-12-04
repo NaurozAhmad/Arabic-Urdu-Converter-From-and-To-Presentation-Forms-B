@@ -267,6 +267,10 @@
      * @returns {string}
      */
     function convertArabic(normal) {
+        if (!normal){
+            return '';
+        }
+
         var len = normal.length;
         /* typeof CharRep*/
         var crep;
@@ -391,6 +395,10 @@
      * @returns {string}
      */
     function convertArabicBack(apfb) {
+        if (!apfb){
+            return '';
+        }
+
         var toReturn = "";
         var charCode;
         var selectedChar;
