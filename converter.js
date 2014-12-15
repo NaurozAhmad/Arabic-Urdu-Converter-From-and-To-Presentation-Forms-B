@@ -395,7 +395,7 @@
      * @returns {string}
      */
     function convertArabicBack(apfb) {
-        if (!apfb){
+        if (!apfb) {
             return '';
         }
 
@@ -406,21 +406,38 @@
 
         for (var i = 0; i < apfb.length; i++) {
             selectedChar = apfb.charCodeAt(i);
-            //console.log("selected char: ", selectedChar);
+            charCode = null;
+            if (selectedChar >= 65136 && selectedChar <= 65279) {
+                //console.log("selected char: ", selectedChar);
 
-            for (var j = 0; j < MAP_LENGTH; j++) {
-                //[4] == .mFinal
-                //[2] == .mInitial
-                //[1] == .mIsolated
-                //[3] == .mMedial
-                if (charsMap[j][4] === selectedChar || charsMap[j][2] === selectedChar ||
-                    charsMap[j][1] === selectedChar || charsMap[j][3] === selectedChar) {
-                    //[0] == .code
-                    charCode = charsMap[j][0];
+                for (var j = 0; j < MAP_LENGTH; j++) {
+                    //[4] == .mFinal
+                    //[2] == .mInitial
+                    //[1] == .mIsolated
+                    //[3] == .mMedial
+                    if (charsMap[j][4] === selectedChar || charsMap[j][2] === selectedChar ||
+                        charsMap[j][1] === selectedChar || charsMap[j][3] === selectedChar) {
+                        //[0] == .code
+                        charCode = charsMap[j][0];
+                    }
                 }
+
+                //check for combChar
+                if (!charCode) {
+                    for (var l = 0; l < COMB_MAP_LENGTH; l++) {
+                        //[4] == .mFinal
+                        //[1] == .mIsolated
+                        if (combCharsMap[l][1] === selectedChar || combCharsMap[l][4] === selectedChar) {
+                            charCode = selectedChar;
+                        }
+                    }
+                }
+
+                //console.log("final char: ", charCode);
+                toReturn += charCode ? String.fromCharCode(charCode) : '';
+            } else {
+                toReturn += apfb[i];
             }
-            //console.log("final char: ", charCode);
-            toReturn += String.fromCharCode(charCode);
         }
 
         return toReturn;
